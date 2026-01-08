@@ -11,6 +11,8 @@ from app.services.stream import stream_loop
 from app.routers.health import router as health_router
 from app.routers.reviews import router as reviews_router
 from app.routers.keywords import router as keywords_router
+from app.routers.predict import router as predict_router
+from app.routers.spring_integration import router as spring_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -26,6 +28,5 @@ def create_app() -> FastAPI:
     app.include_router(health_router)
     app.include_router(reviews_router)
     app.include_router(keywords_router)
-    return app
-
-app = create_app()
+    app.include_router(predict_router)
+    app.include_router(spring_router)
