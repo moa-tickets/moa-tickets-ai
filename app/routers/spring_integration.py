@@ -4,7 +4,7 @@ from fastapi import APIRouter
 from app.core.state import state
 from app.models.schemas import SpringReviewsPayload
 
-router = APIRouter(prefix="/api/spring", tags=["spring-integration"])
+router = APIRouter(prefix="/api", tags=["spring-integration"])
 
 @router.post("/reviews")
 async def receive_reviews_from_spring(payload: SpringReviewsPayload):
@@ -14,8 +14,8 @@ async def receive_reviews_from_spring(payload: SpringReviewsPayload):
     요청 예시:
     {
         "reviews": [
-            {"id": 1, "concert_review": "공연이 좋았어요"},
-            {"id": 2, "concert_review": "너무 훌륭한 공연"}
+            {"id": 1, "concert_review": "공연이 좋았어요", "user_id": 101, "concert_id": 1},
+            {"id": 2, "concert_review": "너무 훌륭한 공연", "user_id": 102, "concert_id": 1}
         ]
     }
     """
@@ -27,7 +27,9 @@ async def receive_reviews_from_spring(payload: SpringReviewsPayload):
     for review in payload.reviews:
         state.reviews_cache.append({
             "id": review.id,
-            "concert_review": review.concert_review
+            "concert_review": review.concert_review,
+            "user_id": review.user_id,
+            "concert_id": review.concert_id
         })
     
     return {

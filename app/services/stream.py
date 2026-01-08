@@ -9,18 +9,18 @@ from app.services.sentiment import predict_sentiment
 from app.services.keyword_extractor import extract_keywords_kor
 
 async def fetch_new_reviews(batch_size: int) -> List[str]:
-    if state.df_reviews is None or state.df_reviews.empty:
+    if state.reviews_cache is None or len(state.reviews_cache) == 0:
         return []
 
-    if state.cursor >= len(state.df_reviews):
+    if state.cursor >= len(state.reviews_cache):
         return []
 
-    end = min(state.cursor + batch_size, len(state.df_reviews))
-    batch = state.df_reviews.iloc[state.cursor:end]
+    end = min(state.cursor + batch_size, len(state.reviews_cache))
+    batch = state.reviews_cache[state.cursor:end]
     state.cursor = end
 
-    col = settings.text_col
-    return [str(x) for x in batch[col].fillna("").tolist()]
+    # reviews_cache는 딕셔너리 리스트 구조
+    return [item.get("concert_review", "") for item in batch if isinstance(item, dict)]
 
 async def stream_loop() -> None:
     while True:

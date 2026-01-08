@@ -30,3 +30,7 @@ def create_app() -> FastAPI:
     app.include_router(keywords_router)
     app.include_router(predict_router)
     app.include_router(spring_router)
+
+    return app
+
+app = create_app()

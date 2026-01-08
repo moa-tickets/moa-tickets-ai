@@ -5,6 +5,8 @@ from pydantic import BaseModel
 class ReviewItem(BaseModel):
     id: int
     concert_review: str
+    user_id: int | None = None
+    concert_id: int | None = None
 
 class ReviewListResponse(BaseModel):
     total: int
@@ -28,6 +30,8 @@ class SpringReviewItem(BaseModel):
     """Spring에서 보낼 리뷰 데이터 항목"""
     id: int
     concert_review: str
+    user_id: int
+    concert_id: int
 
 class SpringReviewsPayload(BaseModel):
     """Spring에서 보낼 리뷰 리스트"""
