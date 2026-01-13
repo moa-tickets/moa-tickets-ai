@@ -8,6 +8,7 @@ router = APIRouter(prefix="/api", tags=["spring-integration"])
 
 @router.post("/reviews")
 async def receive_reviews_from_spring(payload: SpringReviewsPayload):
+    print("✅ Spring API로부터 리뷰 데이터 수신 완료")
     """
     Spring 서버에서 리뷰 데이터를 받아서 state에 저장합니다.
     

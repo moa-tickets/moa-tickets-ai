@@ -1,11 +1,16 @@
 services:
   app:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    image: moaticket-app
     container_name: app
     expose:
       - "8000"
+    volumes:
+      - ./kc_electra_sentiment/final:/moaticket/kc_electra_sentiment/final:ro
     environment:
-      - ENV=prod
+      - MODEL_DIR=/moaticket/kc_electra_sentiment/final
     restart: always
 
   nginx:
