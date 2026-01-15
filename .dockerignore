@@ -1,0 +1,33 @@
+# Python / caches
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtualenv (어디에 있든 전부 제외)
+venv/
+.venv/
+**/venv/
+**/.venv/
+
+.env
+
+# Git
+.git/
+.gitignore
+
+# ML artifacts (크게 먹는 것)
+**/*.pt
+**/*.ckpt
+**/checkpoints/
+**/runs/
+**/wandb/
+**/mlruns/
+
+# requirements.txt/
+
+# data
+data/
+*.csv
+*.parquet

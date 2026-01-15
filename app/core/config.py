@@ -2,7 +2,7 @@ from __future__ import annotations
 from pydantic import BaseModel
 import os
 
-MODEL_DIR = os.getenv("MODEL_DIR", "/moaticket/kc_electra_sentiment/final")
+MODEL_DIR = os.getenv("MODEL_DIR", "kc_electra_sentiment/final")
 
 class Settings(BaseModel):
     csv_path: str = "kr3_concert_reviews.csv"

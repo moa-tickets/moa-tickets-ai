@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import List
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 class ReviewItem(BaseModel):
     id: int
@@ -28,10 +28,10 @@ class KeywordTopRequest(BaseModel):
 # Spring 서버에서 보낼 리뷰 데이터
 class SpringReviewItem(BaseModel):
     """Spring에서 보낼 리뷰 데이터 항목"""
-    id: int
-    concert_review: str
-    user_id: int
-    concert_id: int
+    id: int = Field(alias="reviewId")
+    concert_review: str = Field(alias="content")
+    user_id: int = Field(alias="userId")
+    concert_id: int = Field(alias="concertId")
 
 class SpringReviewsPayload(BaseModel):
     """Spring에서 보낼 리뷰 리스트"""
