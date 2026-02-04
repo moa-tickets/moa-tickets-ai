@@ -28,10 +28,11 @@ def main():
         print(f"Received message: {content}")
 
         labels = predict_sentiment([content])
+        label = labels[0]
         kws = extract_keywords_kor(content)
 
         # ③ 키워드별 루프 대신 파이프라인으로 최적화
-        target_key = 'positive_keywords' if labels == 1 else 'negative_keywords'
+        target_key = 'positive_keywords' if label == 1 else 'negative_keywords'
         pipe = r.pipeline()
         for kw in kws:
             pipe.zincrby(target_key, 1, kw)
