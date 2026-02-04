@@ -1,0 +1,1 @@
+REVIEW_TOPIC = "reviews" # 리뷰 데이터를 위한 토픽 이름
