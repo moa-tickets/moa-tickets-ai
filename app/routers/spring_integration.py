@@ -44,16 +44,16 @@ async def receive_reviews_from_spring(payload: SpringReviewsPayload):
     labels = predict_sentiment(texts)
 
     for text, y in zip(texts, labels):
-                kws = extract_keywords_kor(text)
-                if not kws:
-                    continue
+        kws = extract_keywords_kor(text)
+        if not kws:
+            continue
 
-                if y == 1:
-                    for kw in kws:
-                        r.zincrby('positive_keywords', 1, kw)
-                else:
-                    for kw in kws:
-                        r.zincrby('negative_keywords', 1, kw)
+        if y == 1:
+            for kw in kws:
+                r.zincrby('positive_keywords', 1, kw)
+        else:
+            for kw in kws:
+                r.zincrby('negative_keywords', 1, kw)
 
     
     return {
