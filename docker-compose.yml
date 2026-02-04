@@ -34,3 +34,4 @@ services:
     ports:
       - "6379:6379"   # 로컬 디버깅용 (선택)
     restart: always
+    command: redis-server --appendonly yes # 재시작 시 그대로 복구; 장기 저장
