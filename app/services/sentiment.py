@@ -30,10 +30,10 @@ def predict_sentiment(texts: List[str]) -> List[int]:
     with torch.no_grad():
         out = state.model(**enc)
         probs = torch.softmax(out.logits, dim=-1).cpu().numpy()
-    print(f"Accuracy score: {float(probs.max())}")
+    # print(f"Accuracy score: {float(probs.max())}")
     for p in probs:
         labels.append(int(p.argmax()))
-    print(f"Sentiment: {"positive" if labels[0] == 1 else "negative"}")
+    # print(f"Sentiment: {"positive" if labels[0] == 1 else "negative"}")
     return labels
 
 def predict_one(text: str) -> tuple[int, str, float]:
