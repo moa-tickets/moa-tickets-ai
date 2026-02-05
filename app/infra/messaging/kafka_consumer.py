@@ -16,12 +16,17 @@ def main():
         bootstrap_servers=['localhost:9092', 'localhost:9093', 'localhost:9094'],
         group_id='review-consumer-group',
         value_deserializer=lambda v: json.loads(v.decode('utf-8')),
+        # value_deserializer=lambda v: v.decode("utf-8", errors="replace")
     )
 
     print("[consumer] started")
 
     # ① for 루프 안으로 처리 로직 전체를 이동 (기존: 루프 밖에서 texts 처리)
     for message in consumer:
+        # print("topic:", message.topic, "partition:", message.partition, "offset:", message.offset)
+        # print("key:", repr(message.key))
+        # print("value:", repr(message.value)[:2000])  # 너무 길면 잘라서
+        # break
         payload = message.value.get("reviews", [])[0]
         review_id = payload.get("reviewId", -1)
         content = payload.get("content", "")

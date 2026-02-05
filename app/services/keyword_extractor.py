@@ -11,7 +11,7 @@ except Exception:
     _okt = None
 
 _STOPWORDS_RAW = (
-    "제 "
+    "제 해"
 )
 STOPWORDS = set(_STOPWORDS_RAW.split())
 
