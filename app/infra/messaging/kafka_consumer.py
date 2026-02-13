@@ -44,6 +44,14 @@ def main():
         bootstrap_servers=[s.strip() for s in BOOTSTRAP.split(",")],
         group_id=os.getenv("KAFKA_CONSUMER_GROUP", "review-consumer-group"),
         value_deserializer=safe_json_deserializer,
+        
+        enable_auto_commit=False,          # 처리 성공 후에만 커밋(중복 방지에 도움)
+        auto_offset_reset="latest",
+        
+        # ✅ 핵심: 처리 시간이 길면 여기 값을 키워야 함
+        max_poll_interval_ms=300000,        # 5분 (추론/키워드 추출이 길어도 버팀)
+        session_timeout_ms=30000,           # 30초
+        heartbeat_interval_ms=10000,        # 10초 (session_timeout의 1/3 정도)
     )
 
     print("[consumer] started")
@@ -81,6 +89,7 @@ def main():
             pipe.zincrby(aspect_key, 1, kw)
 
         pipe.execute()
+        consumer.commit()
 
         # (디버그)
         debug_key = f"concert:{concert_id}:{sentiment}:keywords_total"
