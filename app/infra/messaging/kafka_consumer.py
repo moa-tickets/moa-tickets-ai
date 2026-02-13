@@ -64,6 +64,15 @@ def main():
         if not reviews:
             continue
         payload = reviews[0]
+
+        review_id = payload.get("reviewId")
+        if review_id is not None:
+            dedup = r.setnx(f"dedup:review:{review_id}", "1")
+            if not dedup:
+                print(f"[dedup] skip reviewId={review_id}")
+                continue
+            r.expire(f"dedup:review:{review_id}", 7*24*3600)  # 7일 보관
+
         content = payload.get("content", "")
         concert_id = payload.get("concertId", "")
         print(f"Received message: {content}")
