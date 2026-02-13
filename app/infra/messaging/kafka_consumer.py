@@ -24,19 +24,38 @@ aspect_mapper = AspectMapper(
     # priority=["연출", "음향", "시야", "시설"]  # 겹치면 이 순서로 결정
 )
 
+def safe_json_deserializer(v: bytes):
+    if v is None:
+        return None
+    s = v.decode("utf-8", errors="ignore").strip()
+    if not s:
+        return None
+    try:
+        return json.loads(s)
+    except json.JSONDecodeError:
+        # 디버그용으로 일부만 로그
+        print("[warn] non-json message:", s[:200])
+        return None
+
 def main():
     ensure_model_loaded()
     consumer = KafkaConsumer(
         TOPIC,
         bootstrap_servers=[s.strip() for s in BOOTSTRAP.split(",")],
         group_id=os.getenv("KAFKA_CONSUMER_GROUP", "review-consumer-group"),
-        value_deserializer=lambda v: json.loads(v.decode('utf-8')),
+        value_deserializer=safe_json_deserializer,
     )
 
     print("[consumer] started")
 
     for message in consumer:
-        payload = message.value.get("reviews", [])[0]
+        data = message.value
+        if not data:
+            continue
+        reviews = data.get("reviews") or []
+        if not reviews:
+            continue
+        payload = reviews[0]
         content = payload.get("content", "")
         concert_id = payload.get("concertId", "")
         print(f"Received message: {content}")
