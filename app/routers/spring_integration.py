@@ -6,10 +6,15 @@ from app.models.schemas import SpringReviewsPayload
 from app.services.sentiment import predict_sentiment
 from app.services.keyword_extractor import extract_keywords_kor
 
-import redis
+import redis, os
 
 router = APIRouter(prefix="/api", tags=["spring-integration"])
-r = redis.Redis(host='redis', port=6379, db=0)
+r = redis.Redis(
+    host=os.getenv("REDIS_HOST", "redis"),
+    port=int(os.getenv("REDIS_PORT", "6379")),
+    decode_responses=True,
+)
+r.ping()
 
 @router.post("/reviews")
 async def receive_reviews_from_spring(payload: SpringReviewsPayload):

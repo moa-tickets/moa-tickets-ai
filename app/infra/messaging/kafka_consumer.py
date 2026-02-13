@@ -6,8 +6,17 @@ import json
 import redis
 from app.core.init_model import ensure_model_loaded
 from app.services.aspect_mapper import AspectMapper, DEFAULT_ASPECT_DICT
+import os
 
-r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+BOOTSTRAP = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "host.docker.internal:9092")
+TOPIC = os.getenv("KAFKA_TOPIC", REVIEW_TOPIC)
+
+r = redis.Redis(
+    host=os.getenv("REDIS_HOST", "redis"),
+    port=int(os.getenv("REDIS_PORT", "6379")),
+    decode_responses=True,
+)
+r.ping()
 
 # ✅ 매퍼 1회 생성 (루프 밖)
 aspect_mapper = AspectMapper(
@@ -18,9 +27,9 @@ aspect_mapper = AspectMapper(
 def main():
     ensure_model_loaded()
     consumer = KafkaConsumer(
-        REVIEW_TOPIC,
-        bootstrap_servers=['localhost:9092'],
-        group_id='review-consumer-group',
+        TOPIC,
+        bootstrap_servers=[s.strip() for s in BOOTSTRAP.split(",")],
+        group_id=os.getenv("KAFKA_CONSUMER_GROUP", "review-consumer-group"),
         value_deserializer=lambda v: json.loads(v.decode('utf-8')),
     )
 

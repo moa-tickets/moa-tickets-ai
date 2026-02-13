@@ -1,6 +1,6 @@
 services:
   app:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
     image: moaticket-app
@@ -13,8 +13,38 @@ services:
       - MODEL_DIR=/moaticket/kc_electra_sentiment/final
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+
+      # ✅ Kafka는 "컨테이너 밖(EC2 호스트)"에 설치되어 있으므로 host gateway로 접속
+      - KAFKA_BOOTSTRAP_SERVERS=host.docker.internal:9092
+      - KAFKA_TOPIC=reviews
+      - KAFKA_CONSUMER_GROUP=review-consumer-group
+    extra_hosts:
+      # ✅ 리눅스에서 host.docker.internal 활성화 (Docker 20.10+)
+      - "host.docker.internal:host-gateway"
     depends_on:
       - redis
+    restart: always
+
+  # ✅ Kafka consumer는 app 컨테이너에 들어가서 수동 실행하지 말고,
+  #    "별도 서비스"로 항상 띄워두는 게 정석
+  consumer:
+    image: moaticket-app
+    container_name: kafka-consumer
+    command: ["python", "-m", "app.infra.messaging.kafka_consumer"]
+    environment:
+      - MODEL_DIR=/moaticket/kc_electra_sentiment/final
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - KAFKA_BOOTSTRAP_SERVERS=host.docker.internal:9092
+      - KAFKA_TOPIC=reviews
+      - KAFKA_CONSUMER_GROUP=review-consumer-group
+    volumes:
+      - ./kc_electra_sentiment/final:/moaticket/kc_electra_sentiment/final:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - redis
+      - app
     restart: always
 
   nginx:
@@ -32,6 +62,11 @@ services:
     image: redis:7-alpine
     container_name: moaticket-redis
     ports:
-      - "6379:6379"   # 로컬 디버깅용 (선택)
+      - "6379:6379"
     restart: always
-    command: redis-server --appendonly yes # 재시작 시 그대로 복구; 장기 저장
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:
